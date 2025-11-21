@@ -1,0 +1,53 @@
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import PlayerData, Score
+from .utils import send_verification_email   # <-- make sure this exists
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+    email = serializers.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+
+        # deactivate until email is verified
+        user.is_active = False
+        user.save()
+
+        # keep player data creation
+        PlayerData.objects.create(user=user)
+
+        # send verification link
+        send_verification_email(user)
+
+        return user
+
+
+class PlayerDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerData
+        fields = ['coins', 'level']
+
+
+class ScoreSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Score
+        fields = ['user', 'score', 'timestamp']
+

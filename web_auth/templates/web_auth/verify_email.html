@@ -1,0 +1,46 @@
+{% extends 'web_auth/base.html' %}
+
+{% block title %}Verify Email{% endblock %}
+
+{% block content %}
+<h1 id="title">Verifying Email...</h1>
+<div class="loader" id="loader" style="display: block;"></div>
+<p id="message">Please wait while we verify your email address.</p>
+<a href="/" id="home-link"
+    style="display: none; color: var(--primary); text-decoration: none; margin-top: 1rem; display: inline-block;">Return
+    to Home</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const uid = "{{ uidb64 }}";
+        const token = "{{ token }}";
+        const title = document.getElementById('title');
+        const message = document.getElementById('message');
+        const loader = document.getElementById('loader');
+
+        try {
+            const response = await fetch(`/api/verify-email/${uid}/${token}/`);
+            const data = await response.json();
+
+            loader.style.display = 'none';
+
+            if (response.ok) {
+                title.textContent = "Email Verified!";
+                message.textContent = "Your email has been successfully verified. You can now return to the game.";
+                message.style.color = "var(--success)";
+            } else {
+                title.textContent = "Verification Failed";
+                message.textContent = data.error || "The verification link is invalid or has expired.";
+                message.style.color = "var(--error)";
+            }
+        } catch (error) {
+            loader.style.display = 'none';
+            title.textContent = "Error";
+            message.textContent = "An unexpected error occurred. Please try again later.";
+            message.style.color = "var(--error)";
+        }
+    });
+</script>
+{% endblock %}
