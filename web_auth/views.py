@@ -14,3 +14,6 @@ def reset_password_view(request, uidb64, token):
         'uidb64': uidb64,
         'token': token
     })
+
+def home_view(request):
+    return render(request, 'web_auth/home.html')

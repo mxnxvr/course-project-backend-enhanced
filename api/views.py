@@ -57,6 +57,9 @@ class VerifyEmailView(APIView):
 
         user = get_object_or_404(User, pk=uid)
 
+        if user.is_active:
+            return Response({"message": "Email already verified!"}, status=200)
+
         if default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
@@ -89,8 +92,13 @@ class ResetPasswordView(APIView):
 
         if user is not None and default_token_generator.check_token(user, token):
             new_password = request.data.get("password")
+            confirm_password = request.data.get("confirm_password")
+
             if not new_password:
                 return Response({"error": "Password required"}, status=400)
+            
+            if new_password != confirm_password:
+                return Response({"error": "Passwords do not match"}, status=400)
 
             user.set_password(new_password)
             user.save()

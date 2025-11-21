@@ -1,0 +1,35 @@
+{% extends 'web_auth/base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1>Thanks for playing</h1>
+    <p class="subtitle">We hope you enjoyed the experience.</p>
+</div>
+
+<style>
+    .home-container {
+        text-align: center;
+        padding: 4rem 2rem;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #ff6b6b, #feca57);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+        color: #a0a0a0;
+    }
+</style>
+{% endblock %}
