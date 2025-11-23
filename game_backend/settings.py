@@ -119,6 +119,8 @@ EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = "noreply@manar.rocks"
 
 # Security Settings
+PASSWORD_RESET_TIMEOUT = 900  # 15 minutes
+
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
