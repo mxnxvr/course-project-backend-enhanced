@@ -1,7 +1,13 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import PlayerData, Score
-from .utils import send_verification_email   # <-- make sure this exists
+from .utils import send_verification_email
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {
+        'no_active_account': 'Please check the credentials and try again'
+    }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,4 +56,3 @@ class ScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Score
         fields = ['user', 'score', 'timestamp']
-

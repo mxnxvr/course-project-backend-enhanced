@@ -3,13 +3,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from .models import PlayerData, Score
-from .serializers import RegisterSerializer, PlayerDataSerializer, ScoreSerializer
+from .serializers import RegisterSerializer, PlayerDataSerializer, ScoreSerializer, CustomTokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
