@@ -11,9 +11,29 @@ from django.contrib.auth import authenticate
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            # If authentication fails, return just the message string
+            # We need to extract the message from the exception
+            if hasattr(e, 'detail'):
+                msg = e.detail
+                if isinstance(msg, dict) and 'no_active_account' in msg:
+                    return Response(msg['no_active_account'], status=status.HTTP_401_UNAUTHORIZED)
+                if isinstance(msg, dict) and 'detail' in msg:
+                    return Response(msg['detail'], status=status.HTTP_401_UNAUTHORIZED)
+                return Response(str(msg), status=status.HTTP_401_UNAUTHORIZED)
+            return Response("Please check the credentials and try again", status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
