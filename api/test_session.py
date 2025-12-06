@@ -42,3 +42,27 @@ class SingleSessionTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token2)
         response_data2 = self.client.get(reverse('playerdata'))
         self.assertEqual(response_data2.status_code, 200, "Token 2 should work")
+
+    def test_refresh_token_invalidation(self):
+        # 1. Login Session 1
+        response1 = self.client.post(reverse('login'), {'username': self.username, 'password': self.password})
+        token1_access = response1.data['access']
+        token1_refresh = response1.data['refresh']
+
+        # 2. Login Session 2
+        self.client.post(reverse('login'), {'username': self.username, 'password': self.password})
+
+        # 3. Try to refresh Session 1's token
+        # Note: By default, refresh might SUCCEED, but the NEW access token should fail Authorization
+        response_refresh = self.client.post(reverse('token_refresh'), {'refresh': token1_refresh})
+        
+        if response_refresh.status_code == 200:
+            # If refresh succeeds, the new access token MUST NOT work
+            new_access_token = response_refresh.data['access']
+            self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + new_access_token)
+            response_data = self.client.get(reverse('playerdata'))
+            self.assertEqual(response_data.status_code, 403, "Refreshed token from old session must be invalid")
+        else:
+            # It's also acceptable if the refresh itself fails (depending on implementation config)
+            # But currently we haven't customized RefreshView, so we expect 200 -> 403
+            pass

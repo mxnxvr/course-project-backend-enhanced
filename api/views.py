@@ -68,6 +68,8 @@ class SubmitScoreView(APIView):
         return Response({'message': 'Score submitted'})
 
 class LeaderboardView(APIView):
+    permission_classes = [IsAuthenticated, IsSingleSession]
+
     def get(self, request):
         top = Score.objects.all()[:50]
         serializer = ScoreSerializer(top, many=True)
