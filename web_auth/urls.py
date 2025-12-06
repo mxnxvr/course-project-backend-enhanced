@@ -6,4 +6,5 @@ urlpatterns = [
     path('password-reset-request/', views.request_password_reset_view, name='web-password-reset-request'),
     path('reset-password/<str:uidb64>/<str:token>/', views.reset_password_view, name='web-reset-password'),
     path('', views.home_view, name='home'),
+    path('test-session/', views.test_session_view, name='test-session'),
 ]

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Session Test</title>
+</head>
+
+<body>
+    <h1>Session Test</h1>
+    <div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+    <div style="margin-top: 20px;">
+        <button onclick="checkSession()">Check Session (Get PlayerData)</button>
+    </div>
+    <div id="output" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;"></div>
+
+    <script>
+        let accessToken = localStorage.getItem('access_token');
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    accessToken = data.access;
+                    localStorage.setItem('access_token', accessToken);
+                    log("Login Successful! New Session ID generated.");
+                } else {
+                    log("Login Failed: " + JSON.stringify(data));
+                }
+            } catch (e) {
+                log("Error: " + e);
+            }
+        }
+
+        async function checkSession() {
+            if (!accessToken) {
+                log("No token found. Please login first.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/playerdata/', {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + accessToken }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log("Session Valid! Data: " + JSON.stringify(data));
+                } else {
+                    log("Session INVALID! Status: " + response.status + " (You might have been kicked by another login)");
+                }
+            } catch (e) {
+                log("Error: " + e);
+            }
+        }
+
+        function log(msg) {
+            document.getElementById('output').innerText = msg;
+            console.log(msg);
+        }
+    </script>
+</body>
+
+</html>
