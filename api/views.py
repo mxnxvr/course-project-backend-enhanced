@@ -23,6 +23,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
+            print(f"DEBUG: Login Error: {type(e).__name__}: {str(e)}")
+            import traceback
+            traceback.print_exc()
             # If authentication fails, return just the message string
             # We need to extract the message from the exception
             if hasattr(e, 'detail'):
