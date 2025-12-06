@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework.exceptions import AuthenticationFailed
 from .models import PlayerData
 
 class IsSingleSession(permissions.BasePermission):
@@ -21,8 +22,8 @@ class IsSingleSession(permissions.BasePermission):
         try:
             player_data = request.user.playerdata
             if str(player_data.session_id) != str(token_session_id):
-                return False
+                raise AuthenticationFailed(self.message)
         except PlayerData.DoesNotExist:
-            return False
+            raise AuthenticationFailed(self.message)
 
         return True
