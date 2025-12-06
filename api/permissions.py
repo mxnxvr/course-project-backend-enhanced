@@ -20,9 +20,12 @@ class IsSingleSession(permissions.BasePermission):
         # Check against DB
         try:
             player_data = request.user.playerdata
+            print(f"DEBUG: User: {request.user.username}, DB Session: {player_data.session_id}, Token Session: {token_session_id}")
             if str(player_data.session_id) != str(token_session_id):
+                print("DEBUG: Session Mismatch! Denying access.")
                 return False
         except PlayerData.DoesNotExist:
+            print("DEBUG: PlayerData not found")
             return False
 
         return True
