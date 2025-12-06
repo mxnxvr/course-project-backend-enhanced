@@ -3,11 +3,29 @@ from django.contrib.auth.models import User
 from .models import PlayerData, Score
 from .utils import send_verification_email
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import uuid
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     default_error_messages = {
         'no_active_account': 'Please check the credentials and try again'
     }
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Generate session ID
+        session_id = str(uuid.uuid4())
+
+        # Save to PlayerData
+        player_data, _ = PlayerData.objects.get_or_create(user=user)
+        player_data.session_id = session_id
+        player_data.save()
+
+        # Add to token claims
+        token['session_id'] = session_id
+
+        return token
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

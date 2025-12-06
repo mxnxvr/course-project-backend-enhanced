@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import PlayerData, Score
 from .serializers import RegisterSerializer, PlayerDataSerializer, ScoreSerializer, CustomTokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsSingleSession
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate
@@ -40,7 +41,7 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 class PlayerDataView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSingleSession]
 
     def get(self, request):
         player, _ = PlayerData.objects.get_or_create(user=request.user)
@@ -59,7 +60,7 @@ class PlayerDataView(APIView):
         return Response({'message': 'Player data updated successfully!'})
 
 class SubmitScoreView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSingleSession]
 
     def post(self, request):
         score_value = int(request.data.get('score', 0))
