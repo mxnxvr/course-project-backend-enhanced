@@ -16,7 +16,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Generate session ID
         session_id = str(uuid.uuid4())
-        print(f"DEBUG: Generating Token for {user.username}. New Session ID: {session_id}", flush=True)
 
         # Save to PlayerData
         player_data, _ = PlayerData.objects.get_or_create(user=user)
