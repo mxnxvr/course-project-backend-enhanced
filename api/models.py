@@ -6,6 +6,8 @@ class PlayerData(models.Model):
     coins = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
     session_id = models.CharField(max_length=100, null=True, blank=True)
+    failed_login_attempts = models.IntegerField(default=0)
+    lockout_until = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username
